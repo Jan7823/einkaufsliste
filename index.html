@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Familie Einkaufsliste</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0a0a0a;
+            min-height: 100vh;
+            padding: 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Hintergrund-Glow (Die Punkte-Partikel wurden entfernt) */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, #ff006e, #8338ec, #3a86ff, #06ffa5);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+            opacity: 0.15;
+            z-index: 0;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Container: Länger gezogen und mittig */
+        .container {
+            background: rgba(20, 20, 25, 0.98);
+            border-radius: 35px;
+            padding: 60px 35px; /* Mehr Padding für die Länge */
+            max-width: 600px;
+            width: 100%;
+            min-height: 550px; /* Zieht den Kasten in die Länge */
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.8), 0 0 50px rgba(131, 56, 236, 0.2);
+            position: relative;
+            z-index: 2;
+            border: 1px solid rgba(131, 56, 236, 0.3);
+            display: flex;
+            flex-direction: column;
+            animation: containerFloat 0.8s ease-out;
+        }
+
+        /* Leuchtender Rahmen */
+        .container::after {
+            content: '';
+            position: absolute;
+            top: -2px; left: -2px; right: -2px; bottom: -2px;
+            background: linear-gradient(45deg, #ff006e, #8338ec, #3a86ff, #06ffa5);
+            border-radius: 35px;
+            z-index: -1;
+            opacity: 0.3;
+            filter: blur(15px);
+            animation: borderPulse 4s infinite;
+        }
+
+        @keyframes borderPulse {
+            0%, 100% { opacity: 0.2; }
+            50% { opacity: 0.5; }
+        }
+
+        @keyframes containerFloat {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h1 {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #ff006e, #8338ec, #3a86ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-align: center;
+            margin-bottom: 45px;
+            font-size: 2.8em;
+            font-weight: 900;
+        }
+
+        .input-container {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 40px;
+            width: 100%;
+        }
+
+        input {
+            flex: 1;
+            min-width: 0;
+            padding: 18px 22px;
+            background: rgba(40, 40, 50, 0.8);
+            border: 2px solid rgba(131, 56, 236, 0.3);
+            border-radius: 18px;
+            font-size: 16px;
+            color: #fff;
+            text-align: left; /* Text fängt links an */
+            transition: 0.3s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #8338ec;
+            box-shadow: 0 0 20px rgba(131, 56, 236, 0.4);
+        }
+
+        button {
+            padding: 15px 28px;
+            background: linear-gradient(135deg, #ff006e, #8338ec);
+            color: white;
+            border: none;
+            border-radius: 18px;
+            font-size: 20px;
+            cursor: pointer;
+            font-weight: bold;
+            flex-shrink: 0; /* Button bleibt im Kasten */
+            transition: 0.3s;
+        }
+
+        /* Zentrierter Leer-Zustand */
+        .empty-state {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: rgba(255, 255, 255, 0.5);
+            flex-grow: 1; /* Schiebt den Text in die Mitte der neuen Länge */
+            font-size: 1.2em;
+        }
+
+        /* Mobile Fixes */
+        @media (max-width: 550px) {
+            .container {
+                padding: 40px 20px;
+                width: 95%;
+                min-height: 500px;
+            }
+            h1 { font-size: 2em; }
+        }
+
+        .shopping-list { list-style: none; width: 100%; }
+        .shopping-item {
+            background: rgba(45, 45, 55, 0.8);
+            padding: 18px 20px;
+            margin-bottom: 12px;
+            border-radius: 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid rgba(131, 56, 236, 0.2);
+        }
+        .item-text { color: white; font-size: 18px; flex: 1; }
+        .delete-btn { background: #ff006e; border: none; padding: 10px 15px; border-radius: 12px; color: white; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>
+            <span style="font-size: 1.3em; margin-bottom: 10px;">🛒</span>
+            Einkaufsliste
+        </h1>
+        
+        <div class="input-container">
+            <input type="text" id="itemInput" placeholder="Was möchtest du einkaufen? ✨" />
+            <button onclick="addItem()">+</button>
+        </div>
+
+        <ul class="shopping-list" id="shoppingList"></ul>
+        
+        <div class="empty-state" id="emptyState">
+            <span>📝 Deine Einkaufsliste ist leer</span>
+            <small style="font-size: 0.8em; margin-top: 10px; opacity: 0.6;">Füge etwas hinzu! ✨</small>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getDatabase, ref, push, onValue, remove } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAdTqs7DJcYR_O5hw0IT7PwJntbONRaH0E",
+            authDomain: "familie-einkaufsliste.firebaseapp.com",
+            projectId: "familie-einkaufsliste",
+            storageBucket: "familie-einkaufsliste.firebasestorage.app",
+            messagingSenderId: "579605459908",
+            appId: "1:579605459908:web:ffba5a7c9c4ccc60636a91"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+        const itemsRef = ref(database, 'shoppingList');
+
+        onValue(itemsRef, (snapshot) => {
+            const list = document.getElementById('shoppingList');
+            const emptyState = document.getElementById('emptyState');
+            list.innerHTML = '';
+            const data = snapshot.val();
+            
+            if (data) {
+                emptyState.style.display = 'none';
+                Object.entries(data).forEach(([key, value]) => {
+                    const li = document.createElement('li');
+                    li.className = 'shopping-item';
+                    li.innerHTML = `<span class="item-text">${value.name}</span>
+                                   <button class="delete-btn" onclick="deleteItem('${key}')">🗑️</button>`;
+                    list.appendChild(li);
+                });
+            } else {
+                emptyState.style.display = 'flex';
+            }
+        });
+
+        window.addItem = function() {
+            const input = document.getElementById('itemInput');
+            if (input.value.trim() !== '') {
+                push(itemsRef, { name: input.value.trim(), timestamp: Date.now() });
+                input.value = '';
+            }
+        };
+
+        window.deleteItem = function(id) {
+            remove(ref(database, `shoppingList/${id}`));
+        };
+
+        document.getElementById('itemInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') addItem();
+        });
+    </script>
+</body>
+</html>
